@@ -8,7 +8,7 @@
     "redis-self-hosted": "./index.js"
   },
   "scripts": {
-    "push": "git add . && git commit -am auto && git push otigin main && npm publish --access=public",
+    "push": "git add . && git commit -am auto && git push origin main && npm publish --access=public",
     "backend": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
