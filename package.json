@@ -1,0 +1,25 @@
+{
+  "name": "redis-self-hosted",
+  "version": "0.0.1",
+  "description": "subj",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "backend": "node ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "redis",
+    "http",
+    "self",
+    "hosted"
+  ],
+  "author": "Michael Belyakov",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
+    "redis": "^4.6.5"
+  }
+}
