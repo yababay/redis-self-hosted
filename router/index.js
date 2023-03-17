@@ -5,6 +5,8 @@ const router = Router()
 const client = createClient()
 
 router.get('/:key', async (req, res) => {
+    const auth = req.headers.authorization;
+    console.log(auth)
     const { key } = req.params
     const { subkey, from, to } = req.query
     client.connect()
