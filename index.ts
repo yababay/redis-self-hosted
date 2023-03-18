@@ -1,4 +1,4 @@
-import { Request, Router, json } from 'express';
+import { Request, Response, Router, NextFunction, json } from 'express';
 import { createClient } from 'redis'
 import basicAuth from 'express-basic-auth'
 import { username, password } from './lib/settings'
@@ -9,7 +9,11 @@ const users = {}
 Reflect.set(users, username, password)
 
 const unauthorizedResponse = (req: Request) => 'No credentials provided'
-const bauth = basicAuth({users, unauthorizedResponse})
+
+const errors = async (err: Error, req: Request, res: Response, next: NextFunction) => {
+	console.error(err)
+	res.status(500).send(err.message)
+}
 
 router.post('/:key', async (req, res) => {
     const { key } = req.params
@@ -60,4 +64,4 @@ router.get('/:key', async (req, res) => {
     client.disconnect()
 })
 
-export default [bauth, json, router]
+export default { prepare: [basicAuth({users, unauthorizedResponse}), json({limit: '100k'}), errors], router }

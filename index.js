@@ -21,7 +21,10 @@ const client = (0, redis_1.createClient)();
 const users = {};
 Reflect.set(users, settings_1.username, settings_1.password);
 const unauthorizedResponse = (req) => 'No credentials provided';
-const bauth = (0, express_basic_auth_1.default)({ users, unauthorizedResponse });
+const errors = (err, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    console.error(err);
+    res.status(500).send(err.message);
+});
 router.post('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { key } = req.params;
     const { subkey } = req.query;
@@ -75,4 +78,4 @@ router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     client.disconnect();
 }));
-exports.default = [bauth, express_1.json, router];
+exports.default = { prepare: [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '100k' }), errors], router };
