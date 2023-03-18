@@ -1,6 +1,6 @@
 {
   "name": "redis-self-hosted",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "subj",
   "main": "index.js",
   "scripts": {
@@ -18,12 +18,6 @@
   "author": "Michael Belyakov",
   "license": "ISC",
   "repository": "https://github.com/yababay/redis-self-hosted.git",
-  "scripts": {
-    "test": "jest",
-    "build": "tsc"
-  },
-  "keywords": [],
-  "author": "",
   "devDependencies": {
     "@jest/globals": "^29.4.0",
     "@types/jest": "^29.4.0",
