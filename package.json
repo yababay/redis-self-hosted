@@ -1,0 +1,44 @@
+{
+  "name": "redis-self-hosted",
+  "version": "0.0.3",
+  "description": "subj",
+  "main": "index.js",
+  "scripts": {
+    "push": "npx tsc && git add . && git commit -am auto && git push origin main && npm publish --access=public",
+    "clean": "find . -wholename './lib/*.js' -delete -o  -wholename './types/*.js' -delete -o  -wholename './tests/*.js' -delete",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": [
+    "redis",
+    "http",
+    "self",
+    "hosted"
+  ],
+  "author": "Michael Belyakov",
+  "license": "ISC",
+  "repository": "https://github.com/yababay/redis-self-hosted.git",
+  "devDependencies": {
+    "@jest/globals": "^29.4.0",
+    "@types/jest": "^29.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@types/express": "^4.17.17",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup": "^3.19.1",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "eslint": "^8.32.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.3",
+    "ts-jest": "^29.0.5",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
+    "redis": "^4.6.5"
+  }
+}
