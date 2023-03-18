@@ -1,3 +1,4 @@
 tests/
 .husky/
-
+*.ts
+lib/*.ts

@@ -38,7 +38,10 @@ router.post('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* (
             yield client.hSet(key, ownKey, Reflect.get(body, ownKey));
         }
     }
+    else
+        res.status(500).end(`Unsupported content for saving in redis.`);
     client.disconnect();
+    res.end();
 }));
 router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { key } = req.params;
