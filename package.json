@@ -1,20 +1,24 @@
 {
-  "name": "please-fulfill",
-  "version": "0.0.0",
-  "private": true,
-  "description": "Please fulfill",
+  "name": "redis-self-hosted",
+  "version": "0.0.2",
+  "description": "subj",
+  "main": "index.js",
   "scripts": {
-    "_tsc": "npx tsc --init",
-    "_ts_jest": "npx ts-jest config:init",
-    "_husky_init": "./node_modules/.bin/husky install",
-    "_husky_test": "npx husky add .husky/pre-commit 'npm test'",
-    "_husky_lint": "npx husky add .husky/pre-commit 'npx lint-staged'",
-    "_husky": "npm run _husky_init && npm run _husky_test && npm run _husky_lint",
-    "_git": "git add . && git commit -am first",
-    "postinstall": "npm run _tsc && npm run _ts_jest && git init && npm run _husky && npm run _git",
-    "browser-tests": "npx tsc --esModuleInterop src/tests/rollup.config.ts && npx rollup -c src/tests/rollup.config.js",
+    "push": "git add . && git commit -am auto && git push origin main && npm publish --access=public",
     "clean": "find . -wholename './lib/*.js' -delete -o  -wholename './types/*.js' -delete -o  -wholename './tests/*.js' -delete",
-    "backend": "npm run clean && tsc && node ./lib/index.js",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": [
+    "redis",
+    "http",
+    "self",
+    "hosted"
+  ],
+  "author": "Michael Belyakov",
+  "license": "ISC",
+  "repository": "https://github.com/yababay/redis-self-hosted.git",
+  "scripts": {
     "test": "jest",
     "build": "tsc"
   },
@@ -39,6 +43,8 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
+    "redis": "^4.6.5"
   }
 }

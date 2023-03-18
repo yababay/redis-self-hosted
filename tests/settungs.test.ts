@@ -1,6 +1,7 @@
-import { proxyPort } from "../lib/settings"
+import { username, password, redisUrl } from "../lib/settings"
 
-test("proxyPort should be number", () => {
-    expect(typeof proxyPort).toBe('number')
+test("settings should be correct", () => {
+    expect(typeof username).toBe('string')
+    expect(typeof password).toBe('string')
+    expect(typeof redisUrl === 'string' && redisUrl.startsWith('https://')).toBeTruthy()
 })
-

@@ -2,15 +2,12 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const {
-    PROXY_PORT,
+    BASIC_AUTH,
+    REDIS_URL
 } = process.env
 
-function getProxyPort(){
-    const usual = 3000
-    if(typeof PROXY_PORT !== 'string') return usual
-    const port = parseInt(PROXY_PORT)
-    return isNaN(port) || port < 1024 ? usual : port
-}
+if(!(BASIC_AUTH && REDIS_URL)) throw 'Not configures yet (url, auth).'
+const [username, password] = BASIC_AUTH.split(':')
+if(!(username && password)) throw 'No username or password.'
 
-export const proxyPort = getProxyPort()
-
+export { username, password, REDIS_URL as redisUrl }
