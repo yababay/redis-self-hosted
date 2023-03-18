@@ -1,0 +1,1 @@
+Plase here templates for your pages.

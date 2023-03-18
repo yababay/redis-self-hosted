@@ -1,0 +1,44 @@
+{
+  "name": "please-fulfill",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Please fulfill",
+  "scripts": {
+    "_tsc": "npx tsc --init",
+    "_ts_jest": "npx ts-jest config:init",
+    "_husky_init": "./node_modules/.bin/husky install",
+    "_husky_test": "npx husky add .husky/pre-commit 'npm test'",
+    "_husky_lint": "npx husky add .husky/pre-commit 'npx lint-staged'",
+    "_husky": "npm run _husky_init && npm run _husky_test && npm run _husky_lint",
+    "_git": "git add . && git commit -am first",
+    "postinstall": "npm run _tsc && npm run _ts_jest && git init && npm run _husky && npm run _git",
+    "browser-tests": "npx tsc --esModuleInterop src/tests/rollup.config.ts && npx rollup -c src/tests/rollup.config.js",
+    "clean": "find . -wholename './lib/*.js' -delete -o  -wholename './types/*.js' -delete -o  -wholename './tests/*.js' -delete",
+    "backend": "npm run clean && tsc && node ./lib/index.js",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "devDependencies": {
+    "@jest/globals": "^29.4.0",
+    "@types/jest": "^29.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@types/express": "^4.17.17",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup": "^3.19.1",
+    "rollup-plugin-esbuild": "^5.0.0",
+    "eslint": "^8.32.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.0",
+    "prettier": "^2.8.3",
+    "ts-jest": "^29.0.5",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  }
+}
