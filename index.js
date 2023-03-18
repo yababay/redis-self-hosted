@@ -12,11 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = exports.prepare = void 0;
 const express_1 = require("express");
 const redis_1 = require("redis");
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
 const settings_1 = require("./lib/settings");
 const router = (0, express_1.Router)();
+exports.router = router;
 const client = (0, redis_1.createClient)();
 const users = {};
 Reflect.set(users, settings_1.username, settings_1.password);
@@ -78,4 +80,5 @@ router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     client.disconnect();
 }));
-exports.default = { prepare: [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '100k' }), errors], router };
+const prepare = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '100k' }), errors];
+exports.prepare = prepare;

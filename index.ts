@@ -64,4 +64,5 @@ router.get('/:key', async (req, res) => {
     client.disconnect()
 })
 
-export default { prepare: [basicAuth({users, unauthorizedResponse}), json({limit: '100k'}), errors], router }
+const prepare = [basicAuth({users, unauthorizedResponse}), json({limit: '100k'}), errors]
+export { prepare, router }

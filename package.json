@@ -1,6 +1,6 @@
 {
   "name": "redis-self-hosted",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "subj",
   "main": "index.js",
   "scripts": {
