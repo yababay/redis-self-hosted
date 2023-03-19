@@ -76,5 +76,5 @@ router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     client.disconnect();
 }));
-const middleware = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '10k' })];
+const middleware = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '10kb' })];
 exports.middleware = middleware;
