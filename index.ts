@@ -59,5 +59,5 @@ router.get('/:key', async (req, res) => {
     client.disconnect()
 })
 
-const middleware = [basicAuth({users, unauthorizedResponse}), json({limit: '10kb'})]
+const middleware = [basicAuth({users, unauthorizedResponse}), json({limit: '10kb', strict: false})]
 export { middleware, router }
