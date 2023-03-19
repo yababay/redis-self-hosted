@@ -1,13 +1,10 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
-const {
-    BASIC_AUTH,
-    REDIS_URL
-} = process.env
+const { BASIC_AUTH } = process.env
 
-if(!(BASIC_AUTH && REDIS_URL)) throw 'Not configures yet (url, auth).'
+if(!BASIC_AUTH) throw 'Authentication is not configures yet.'
 const [username, password] = BASIC_AUTH.split(':')
 if(!(username && password)) throw 'No username or password.'
 
-export { username, password, REDIS_URL as redisUrl }
+export { username, password }

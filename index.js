@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.router = exports.prepare = void 0;
+exports.router = exports.middleware = void 0;
 const express_1 = require("express");
 const redis_1 = require("redis");
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
@@ -23,10 +23,6 @@ const client = (0, redis_1.createClient)();
 const users = {};
 Reflect.set(users, settings_1.username, settings_1.password);
 const unauthorizedResponse = (req) => 'No credentials provided';
-const errors = (err, req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    console.error(err);
-    res.status(500).send(err.message);
-});
 router.post('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { key } = req.params;
     const { subkey } = req.query;
@@ -50,12 +46,12 @@ router.post('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* (
 }));
 router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { key } = req.params;
-    const { subkey, from, to } = req.query;
     client.connect();
-    const keyType = yield client.type(key);
     if (!(yield client.exists(key)))
         res.status(500).end(`The key ${key} is not found`);
     else {
+        const keyType = yield client.type(key);
+        const { subkey, from, to } = req.query;
         switch (keyType) {
             case 'string':
                 res.json(yield client.get(key));
@@ -80,5 +76,5 @@ router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
     client.disconnect();
 }));
-const prepare = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '100k' }), errors];
-exports.prepare = prepare;
+const middleware = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '10k' })];
+exports.middleware = middleware;

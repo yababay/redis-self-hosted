@@ -1,4 +1,4 @@
-import { Request, Response, Router, NextFunction, json } from 'express';
+import { Request, Router, json } from 'express';
 import { createClient } from 'redis'
 import basicAuth from 'express-basic-auth'
 import { username, password } from './lib/settings'
@@ -9,11 +9,6 @@ const users = {}
 Reflect.set(users, username, password)
 
 const unauthorizedResponse = (req: Request) => 'No credentials provided'
-
-const errors = async (err: Error, req: Request, res: Response, next: NextFunction) => {
-	console.error(err)
-	res.status(500).send(err.message)
-}
 
 router.post('/:key', async (req, res) => {
     const { key } = req.params
@@ -35,11 +30,11 @@ router.post('/:key', async (req, res) => {
 
 router.get('/:key', async (req, res) => {
     const { key } = req.params
-    const { subkey, from, to } = req.query
     client.connect()
-    const keyType = await client.type(key)
     if(!await client.exists(key)) res.status(500).end(`The key ${key} is not found`)
     else {
+        const keyType = await client.type(key)
+        const { subkey, from, to } = req.query
         switch(keyType){
             case 'string':
                 res.json(await client.get(key))
@@ -64,5 +59,5 @@ router.get('/:key', async (req, res) => {
     client.disconnect()
 })
 
-const prepare = [basicAuth({users, unauthorizedResponse}), json({limit: '100k'}), errors]
-export { prepare, router }
+const middleware = [basicAuth({users, unauthorizedResponse}), json({limit: '10k'})]
+export { middleware, router }
