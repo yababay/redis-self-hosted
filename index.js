@@ -8,73 +8,114 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _RedisApi_redis, _RedisApi_router, _RedisApi_request, _RedisApi_response;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.router = exports.middleware = void 0;
+exports.BasicApi = exports.RedisApi = void 0;
 const express_1 = require("express");
 const redis_1 = require("redis");
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
 const settings_1 = require("./lib/settings");
-const router = (0, express_1.Router)();
-exports.router = router;
-const client = (0, redis_1.createClient)();
+class RedisApi {
+    constructor(req, res) {
+        _RedisApi_redis.set(this, (0, redis_1.createClient)());
+        _RedisApi_router.set(this, (0, express_1.Router)());
+        _RedisApi_request.set(this, void 0);
+        _RedisApi_response.set(this, void 0);
+        __classPrivateFieldSet(this, _RedisApi_request, req, "f");
+        __classPrivateFieldSet(this, _RedisApi_response, res, "f");
+    }
+    get request() { return __classPrivateFieldGet(this, _RedisApi_request, "f"); }
+    get response() { return __classPrivateFieldGet(this, _RedisApi_response, "f"); }
+    get redis() { return __classPrivateFieldGet(this, _RedisApi_redis, "f"); }
+    get router() { return __classPrivateFieldGet(this, _RedisApi_router, "f"); }
+    setup(app, path, processErrors = false) {
+        app.use(path, middleware, this.router);
+        if (processErrors)
+            app.use(errors);
+    }
+}
+exports.RedisApi = RedisApi;
+_RedisApi_redis = new WeakMap(), _RedisApi_router = new WeakMap(), _RedisApi_request = new WeakMap(), _RedisApi_response = new WeakMap();
+class BasicApi extends RedisApi {
+    constructor(req, res) {
+        super(req, res);
+        const { router, redis: client } = this;
+        router.post('/:key', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { key } = req.params;
+            const { subkey } = req.query;
+            const { body } = req;
+            client.connect();
+            if (typeof subkey === 'string')
+                yield client.hSet(key, subkey, `${body}`);
+            else if (typeof body === 'string')
+                yield client.set(key, body);
+            else if (typeof body === 'object') {
+                for (const ownKey of Reflect.ownKeys(body)) {
+                    if (typeof ownKey !== 'string')
+                        continue;
+                    yield client.hSet(key, ownKey, Reflect.get(body, ownKey));
+                }
+            }
+            else
+                res.status(500).end(`Unsupported content for saving in redis.`);
+            client.disconnect();
+            res.end();
+        }));
+        router.get('/:key', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { key } = req.params;
+            client.connect();
+            if (!(yield client.exists(key)))
+                res.status(500).end(`The key ${key} is not found`);
+            else {
+                const keyType = yield client.type(key);
+                const { subkey, from, to } = req.query;
+                switch (keyType) {
+                    case 'string':
+                        res.json(yield client.get(key));
+                        break;
+                    case 'hash':
+                        res.json(typeof subkey === 'string' ? yield client.hGet(key, subkey) : yield client.hGetAll(key));
+                        break;
+                    case 'list':
+                        if (from && to && !isNaN(+from) && !isNaN(+to))
+                            res.json(yield client.lRange(key, +from, +to));
+                        else {
+                            const length = yield client.lLen(key);
+                            res.json(yield client.lRange(key, 0, length));
+                        }
+                        break;
+                    case 'set':
+                        res.json(yield client.sMembers(key));
+                        break;
+                    default:
+                        res.status(500).end(`Working with ${keyType} in not implemented yet.`);
+                }
+            }
+            client.disconnect();
+        }));
+    }
+}
+exports.BasicApi = BasicApi;
 const users = {};
 Reflect.set(users, settings_1.username, settings_1.password);
 const unauthorizedResponse = (req) => 'No credentials provided';
-router.post('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { key } = req.params;
-    const { subkey } = req.query;
-    const { body } = req;
-    client.connect();
-    if (typeof subkey === 'string')
-        yield client.hSet(key, subkey, `${body}`);
-    else if (typeof body === 'string')
-        yield client.set(key, body);
-    else if (typeof body === 'object') {
-        for (const ownKey of Reflect.ownKeys(body)) {
-            if (typeof ownKey !== 'string')
-                continue;
-            yield client.hSet(key, ownKey, Reflect.get(body, ownKey));
-        }
-    }
-    else
-        res.status(500).end(`Unsupported content for saving in redis.`);
-    client.disconnect();
-    res.end();
-}));
-router.get('/:key', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { key } = req.params;
-    client.connect();
-    if (!(yield client.exists(key)))
-        res.status(500).end(`The key ${key} is not found`);
-    else {
-        const keyType = yield client.type(key);
-        const { subkey, from, to } = req.query;
-        switch (keyType) {
-            case 'string':
-                res.json(yield client.get(key));
-                break;
-            case 'hash':
-                res.json(typeof subkey === 'string' ? yield client.hGet(key, subkey) : yield client.hGetAll(key));
-                break;
-            case 'list':
-                if (from && to && !isNaN(+from) && !isNaN(+to))
-                    res.json(yield client.lRange(key, +from, +to));
-                else {
-                    const length = yield client.lLen(key);
-                    res.json(yield client.lRange(key, 0, length));
-                }
-                break;
-            case 'set':
-                res.json(yield client.sMembers(key));
-                break;
-            default:
-                res.status(500).end(`Working with ${keyType} in not implemented yet.`);
-        }
-    }
-    client.disconnect();
-}));
 const middleware = [(0, express_basic_auth_1.default)({ users, unauthorizedResponse }), (0, express_1.json)({ limit: '10kb', strict: false })];
-exports.middleware = middleware;
+const errors = (err, req, res, next) => {
+    const { message } = err;
+    console.error(message);
+    res.status(500).end(message);
+};

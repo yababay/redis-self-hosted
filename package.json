@@ -1,13 +1,14 @@
 {
   "name": "redis-self-hosted",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "description": "subj",
   "main": "index.js",
+  "typings": "index.d.ts",
   "scripts": {
-    "push": "npx tsc && git add . && git commit -am auto && git push origin main && npm publish --access=public",
+    "push": "npm run build && git add . && git commit -am auto && git push origin main && npm publish --access=public",
     "clean": "find . -wholename './lib/*.js' -delete -o  -wholename './types/*.js' -delete -o  -wholename './tests/*.js' -delete",
     "test": "jest",
-    "build": "tsc"
+    "build": "tsc -d"
   },
   "keywords": [
     "redis",
