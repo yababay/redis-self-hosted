@@ -1,11 +1,11 @@
 {
   "name": "redis-self-hosted",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "subj",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "push": "npm run build && git add . && git commit -am auto && git push origin main && npm publish --access=public",
+    "push": "npm run clean && git add . && read -p 'Введите текст комментария для коммита (без пробелов): ' COMMENT && git commit -am $COMMENT && git push origin main && npm run build && npm publish --access=public",
     "clean": "find . -wholename './lib/*.js' -delete -o  -wholename './types/*.js' -delete -o  -wholename './tests/*.js' -delete",
     "test": "jest",
     "build": "tsc -d"

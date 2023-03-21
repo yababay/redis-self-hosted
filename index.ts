@@ -3,33 +3,35 @@ import { createClient } from 'redis'
 import basicAuth from 'express-basic-auth'
 import { username, password } from './lib/settings'
 
+const client = createClient()
+
+type Middleware = (req: Request, res: Response, next: NextFunction) => void
+
 class RedisApi {
 
-    #redis = createClient()
     #router = Router()
-    #request: Request
-    #response: Response
+    #middleware: Middleware | null = null
 
-    constructor(req: Request, res: Response){
-        this.#request = req
-        this.#response = res
+    constructor(middleware: Middleware | null = null){
+        this.#middleware = middleware
     }
 
-    get request(){ return this.#request }
-    get response(){ return this.#response }
-    get redis(){ return this.#redis }
+    get redis(){ return client }
     get router(){ return this.#router }
+    get middleware(){ return this.#middleware }
 
     setup(app: Application, path: string, processErrors = false){
-        app.use(path, middleware, this.router)
+        const { middleware: mw } = this
+        if(mw === null) app.use(path, middleware, this.router)
+        else app.use(path, middleware, mw, this.router)
         if(processErrors) app.use(errors)
     }
 } 
 
 class BasicApi extends RedisApi {
 
-    constructor(req: Request, res: Response){
-        super(req, res)
+    constructor(){
+        super()
         const { router, redis: client } = this
 
         router.post('/:key', async (req, res) => {
