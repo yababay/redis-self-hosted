@@ -22,37 +22,38 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _RedisApi_redis, _RedisApi_router, _RedisApi_request, _RedisApi_response;
+var _RedisApi_router, _RedisApi_middleware;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BasicApi = exports.RedisApi = void 0;
 const express_1 = require("express");
 const redis_1 = require("redis");
 const express_basic_auth_1 = __importDefault(require("express-basic-auth"));
 const settings_1 = require("./lib/settings");
+const client = (0, redis_1.createClient)();
 class RedisApi {
-    constructor(req, res) {
-        _RedisApi_redis.set(this, (0, redis_1.createClient)());
+    constructor(middleware = null) {
         _RedisApi_router.set(this, (0, express_1.Router)());
-        _RedisApi_request.set(this, void 0);
-        _RedisApi_response.set(this, void 0);
-        __classPrivateFieldSet(this, _RedisApi_request, req, "f");
-        __classPrivateFieldSet(this, _RedisApi_response, res, "f");
+        _RedisApi_middleware.set(this, null);
+        __classPrivateFieldSet(this, _RedisApi_middleware, middleware, "f");
     }
-    get request() { return __classPrivateFieldGet(this, _RedisApi_request, "f"); }
-    get response() { return __classPrivateFieldGet(this, _RedisApi_response, "f"); }
-    get redis() { return __classPrivateFieldGet(this, _RedisApi_redis, "f"); }
+    get redis() { return client; }
     get router() { return __classPrivateFieldGet(this, _RedisApi_router, "f"); }
+    get middleware() { return __classPrivateFieldGet(this, _RedisApi_middleware, "f"); }
     setup(app, path, processErrors = false) {
-        app.use(path, middleware, this.router);
+        const { middleware: mw } = this;
+        if (mw === null)
+            app.use(path, middleware, this.router);
+        else
+            app.use(path, middleware, mw, this.router);
         if (processErrors)
             app.use(errors);
     }
 }
 exports.RedisApi = RedisApi;
-_RedisApi_redis = new WeakMap(), _RedisApi_router = new WeakMap(), _RedisApi_request = new WeakMap(), _RedisApi_response = new WeakMap();
+_RedisApi_router = new WeakMap(), _RedisApi_middleware = new WeakMap();
 class BasicApi extends RedisApi {
-    constructor(req, res) {
-        super(req, res);
+    constructor() {
+        super();
         const { router, redis: client } = this;
         router.post('/:key', (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { key } = req.params;

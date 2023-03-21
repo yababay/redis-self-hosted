@@ -11,17 +11,20 @@ class RedisApi {
 
     #router = Router()
     #middleware: Middleware | null = null
+    #application: Application
 
-    constructor(middleware: Middleware | null = null){
+    constructor(application: Application, middleware: Middleware | null = null){
         this.#middleware = middleware
+        this.#application = application
     }
 
     get redis(){ return client }
     get router(){ return this.#router }
     get middleware(){ return this.#middleware }
+    get application(){ return this.#application }
 
-    setup(app: Application, path: string, processErrors = false){
-        const { middleware: mw } = this
+    bind(path: string, processErrors = false){
+        const { middleware: mw, application: app } = this
         if(mw === null) app.use(path, middleware, this.router)
         else app.use(path, middleware, mw, this.router)
         if(processErrors) app.use(errors)
@@ -30,8 +33,8 @@ class RedisApi {
 
 class BasicApi extends RedisApi {
 
-    constructor(){
-        super()
+    constructor(app: Application){
+        super(app)
         const { router, redis: client } = this
 
         router.post('/:key', async (req, res) => {

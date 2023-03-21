@@ -1,10 +1,8 @@
-/// <reference types="qs" />
-import { Request, Response, Application } from 'express';
+import { Request, Response, NextFunction, Application } from 'express';
+type Middleware = (req: Request, res: Response, next: NextFunction) => void;
 declare class RedisApi {
     #private;
-    constructor(req: Request, res: Response);
-    get request(): Request<import("express-serve-static-core").ParamsDictionary, any, any, import("qs").ParsedQs, Record<string, any>>;
-    get response(): Response<any, Record<string, any>>;
+    constructor(middleware?: Middleware | null);
     get redis(): import("@redis/client").RedisClientType<{
         graph: {
             CONFIG_GET: typeof import("@redis/graph/dist/commands/CONFIG_GET");
@@ -290,9 +288,10 @@ declare class RedisApi {
         };
     } & import("redis").RedisModules, import("redis").RedisFunctions, import("redis").RedisScripts>;
     get router(): import("express-serve-static-core").Router;
+    get middleware(): Middleware | null;
     setup(app: Application, path: string, processErrors?: boolean): void;
 }
 declare class BasicApi extends RedisApi {
-    constructor(req: Request, res: Response);
+    constructor();
 }
 export { RedisApi, BasicApi };
